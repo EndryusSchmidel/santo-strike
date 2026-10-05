@@ -1,0 +1,5 @@
+# Material interno da Verbinden: nunca publicar (propostas, valores, PDFs)
+output/
+propostas/
+tmp/
+.claude/
