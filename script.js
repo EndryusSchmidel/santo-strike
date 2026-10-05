@@ -207,3 +207,157 @@ if (faqItems.length && !reduceMotion && typeof Element.prototype.animate === 'fu
     });
   });
 }
+
+// Monte sua reserva: monta a mensagem completa e abre o WhatsApp
+const bookingForm = document.querySelector('#booking-form');
+if (bookingForm) {
+  const WHATSAPP = '5521988799699';
+  const DIRECT = 'https://ig.me/m/santo_strike_conta_reseva';
+  const preview = bookingForm.querySelector('#booking-preview');
+  const peopleOutput = bookingForm.querySelector('#booking-people');
+  const dateInput = bookingForm.querySelector('#booking-date');
+  const warning = bookingForm.querySelector('#booking-warning');
+  const birthday = bookingForm.querySelector('#booking-birthday');
+  const birthdayHint = bookingForm.querySelector('#birthday-hint');
+  const nameInput = bookingForm.querySelector('#booking-name');
+  const submit = bookingForm.querySelector('.booking-submit');
+  const directButton = bookingForm.querySelector('#booking-direct');
+  const copied = bookingForm.querySelector('#booking-copied');
+  const dayChips = [...bookingForm.querySelectorAll('[data-group="day"] .chip')];
+
+  const now = Object.fromEntries(saoPauloClock.formatToParts(new Date()).map(({ type, value }) => [type, value]));
+  const todayUtc = Date.UTC(Number(now.year), Number(now.month) - 1, Number(now.day));
+  const minutesNow = Number(now.hour) * 60 + Number(now.minute);
+  const dayMs = 24 * 60 * 60 * 1000;
+  const toKey = (date) => date.toISOString().slice(0, 10);
+
+  const isOpenOn = (date) => {
+    const weekday = date.getUTCDay();
+    return Boolean(weeklySchedule.get(weekday)) && !isClosedByException(toKey(date), weekday, date.getUTCDate());
+  };
+  const formatDay = (date) => {
+    const label = new Intl.DateTimeFormat('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit', timeZone: 'UTC' })
+      .format(date).replace('-feira', '');
+    return label.charAt(0).toUpperCase() + label.slice(1);
+  };
+
+  const state = { date: null, time: '19h', people: 4, rodizio: 'Tradicional' };
+  dateInput.min = toKey(new Date(todayUtc));
+
+  // Hoje some se a casa estiver fechada ou perto de fechar; amanhã some se for dia fechado
+  const today = new Date(todayUtc);
+  const todaySchedule = weeklySchedule.get(today.getUTCDay());
+  dayChips[0].disabled = !isOpenOn(today) || (todaySchedule && minutesNow > todaySchedule.closes - 60);
+  dayChips[1].disabled = !isOpenOn(new Date(todayUtc + dayMs));
+
+  const selectChip = (chip) => {
+    chip.parentElement.querySelectorAll('.chip').forEach((other) => other.classList.toggle('is-active', other === chip));
+  };
+
+  const selectDay = (chip, focus = true) => {
+    selectChip(chip);
+    const choice = chip.dataset.day;
+    dateInput.hidden = choice !== 'other';
+    if (choice === 'other') {
+      state.date = dateInput.value ? new Date(`${dateInput.value}T00:00:00Z`) : null;
+      if (!dateInput.value && focus) dateInput.focus();
+    } else {
+      state.date = new Date(todayUtc + Number(choice) * dayMs);
+    }
+    render();
+  };
+
+  const buildMessage = () => {
+    const lines = ['Olá! Quero fazer uma reserva no Santo Strike 🎳'];
+    lines.push(`📅 ${state.date ? formatDay(state.date) : 'Data a combinar'} — chegada às ${state.time}`);
+    lines.push(`👥 ${state.people} ${state.people === 1 ? 'pessoa' : 'pessoas'}`);
+    lines.push(state.rodizio
+      ? `🍕 Rodízio ${state.rodizio} (${state.rodizio === 'Fusion' ? '2º' : '1º'} piso)`
+      : '🍕 Ainda vou escolher o rodízio');
+    if (birthday.checked) lines.push('🎂 Tem aniversariante no grupo');
+    const name = nameInput.value.trim();
+    if (name) lines.push(`Nome: ${name}`);
+    return lines.join('\n');
+  };
+
+  function render() {
+    const isToday = state.date && state.date.getTime() === todayUtc;
+    const closed = state.date && !isOpenOn(state.date);
+    const past = state.date && state.date.getTime() < todayUtc;
+    warning.hidden = !(closed || past);
+    if (past) warning.textContent = 'Escolha uma data a partir de hoje.';
+    else if (closed) warning.textContent = 'Nesse dia a casa está fechada (segundas e 3º domingo do mês). Escolha outra data.';
+    submit.disabled = !state.date || closed || past;
+    directButton.hidden = !isToday;
+    copied.hidden = true;
+
+    birthdayHint.hidden = !birthday.checked;
+    if (birthday.checked) {
+      const missing = 11 - state.people;
+      birthdayHint.innerHTML = missing <= 0
+        ? '<strong>Com esse grupo, o aniversariante não paga o rodízio!</strong> Vale no dia do aniversário, a cada 10 pagantes.'
+        : `Faltam <strong>${missing} ${missing === 1 ? 'pessoa' : 'pessoas'}</strong> para o aniversariante ganhar o rodízio (a cada 10 pagantes).`;
+    }
+
+    peopleOutput.textContent = state.people;
+    preview.textContent = buildMessage();
+  }
+
+  dayChips.forEach((chip) => chip.addEventListener('click', () => selectDay(chip)));
+  dateInput.addEventListener('change', () => {
+    state.date = dateInput.value ? new Date(`${dateInput.value}T00:00:00Z`) : null;
+    render();
+  });
+
+  bookingForm.querySelectorAll('[data-group="time"] .chip, [data-group="rodizio"] .chip').forEach((chip) => {
+    chip.addEventListener('click', () => {
+      selectChip(chip);
+      state[chip.parentElement.dataset.group] = chip.dataset.value;
+      render();
+    });
+  });
+
+  bookingForm.querySelectorAll('[data-step]').forEach((button) => {
+    button.addEventListener('click', () => {
+      state.people = Math.min(80, Math.max(1, state.people + Number(button.dataset.step)));
+      render();
+    });
+  });
+
+  birthday.addEventListener('change', render);
+  nameInput.addEventListener('input', render);
+
+  document.querySelectorAll('[data-birthday]').forEach((link) => {
+    link.addEventListener('click', () => {
+      birthday.checked = true;
+      render();
+    });
+  });
+
+  bookingForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    if (submit.disabled) return;
+    window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(buildMessage())}`, '_blank', 'noopener');
+  });
+
+  directButton.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(buildMessage());
+      copied.hidden = false;
+    } catch {
+      copied.hidden = true;
+    }
+    window.open(DIRECT, '_blank', 'noopener');
+  });
+
+  selectDay(dayChips.find((chip) => !chip.disabled) ?? dayChips[2], false);
+}
+
+// O botão flutuante sai de cena enquanto o formulário de reserva está visível
+const floatButton = document.querySelector('.whatsapp-float');
+const bookingSection = document.querySelector('#reservar');
+if (floatButton && bookingSection && 'IntersectionObserver' in window) {
+  new IntersectionObserver(([entry]) => {
+    floatButton.classList.toggle('is-hidden', entry.isIntersecting);
+  }, { threshold: 0.15 }).observe(bookingSection);
+}
