@@ -3,3 +3,7 @@ output/
 propostas/
 tmp/
 .claude/
+
+# Originais pesados das imagens (o site usa as versões -v2.jpg otimizadas)
+assets/ChatGPT Image*
+assets/Gemini_Generated_Image_*
