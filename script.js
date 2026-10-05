@@ -53,7 +53,7 @@ galleryDialog?.addEventListener('click', (event) => {
   if (event.target === galleryDialog) galleryDialog.close();
 });
 galleryDialog?.addEventListener('close', () => {
-  if (galleryDialogImage) galleryDialogImage.src = '';
+  if (galleryDialogImage) galleryDialogImage.removeAttribute('src');
 });
 
 const saoPauloWeekday = new Intl.DateTimeFormat('en-US', {
