@@ -137,6 +137,13 @@ h1 em, h2 em { color: var(--gold); font-weight: 500; }
 .menu-image-slot { aspect-ratio: 1.55; position: relative; display: flex; align-items: flex-end; justify-content: space-between; overflow: hidden; padding: 16px; color: #ddd5c2; background: radial-gradient(ellipse at 50% 46%, #96753849, transparent 47%), linear-gradient(135deg, #302b21, #171612 72%); }
 .menu-image-slot::before { position: absolute; inset: 12px; border: 1px solid #ffffff26; content: ""; pointer-events: none; }
 .menu-image-index, .menu-image-note { position: relative; z-index: 1; font-size: 8px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+.menu-image-slot.has-photo { background: #171612; }
+.menu-image-slot.has-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .6s cubic-bezier(.2,.65,.3,1); }
+.menu-image-slot.has-photo::after { position: absolute; inset: 0; background: linear-gradient(to top, #0d0c0a99, transparent 42%); content: ""; pointer-events: none; }
+.menu-image-slot.has-photo::before { z-index: 1; }
+.menu-card:hover .menu-image-slot.has-photo img { transform: scale(1.04); }
+[data-image-slot="pizzas-doces"] img { object-position: 50% 40%; }
+[data-image-slot="buffet-e-bebidas"] img { object-position: 50% 40%; }
 .menu-image-mark { position: absolute; top: 50%; left: 50%; color: var(--gold); font-size: 42px; opacity: .8; transform: translate(-50%, -50%); }
 .menu-card-copy { padding: 20px 22px 23px; }
 .menu-card-kicker { color: var(--gold); font-size: 8px; font-weight: 700; letter-spacing: .16em; }
