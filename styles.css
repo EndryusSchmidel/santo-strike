@@ -245,12 +245,13 @@ h1 em, h2 em { color: var(--gold); font-weight: 500; }
 .footer-social a { color: #d2cec3; font-size: 13px; transition: color .2s; }
 .footer-social a span { padding-left: 5px; color: var(--gold); font-size: 14px; }
 .footer-social a:hover, .footer-social a:focus-visible { color: var(--gold-bright); }
-.footer-bottom { max-width: 1120px; margin: 0 auto; padding-top: 12px; display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto auto; align-items: center; gap: 7px 20px; color: #a5a196; font-size: 10px; }
+.footer-bottom { max-width: 1120px; margin: 0 auto; padding-top: 12px; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); grid-template-rows: auto auto; align-items: center; gap: 7px 20px; color: #a5a196; font-size: 10px; }
 .footer-bottom a { color: #d2cec3; }
+.footer-copyright { grid-column: 1 / 3; grid-row: 1; }
 .footer-city { grid-column: 1; grid-row: 2; }
-.footer-credit { grid-column: 2; grid-row: 2; justify-self: end; }
+.footer-credit { grid-column: 2; grid-row: 2; justify-self: center; text-align: center; white-space: nowrap; }
 .footer-credit a { color: var(--gold); text-decoration: underline; text-decoration-color: #9b742b; text-underline-offset: 3px; transition: color .2s; }
-.footer-top-link { grid-column: 2; grid-row: 1; justify-self: end; display: inline-flex; align-items: center; gap: 8px; font-size: 11px; transition: color .2s; }
+.footer-top-link { grid-column: 3; grid-row: 1; justify-self: end; display: inline-flex; align-items: center; gap: 8px; font-size: 11px; transition: color .2s; }
 .footer-top-link span { color: var(--gold); transition: transform .2s; }
 .footer-top-link:hover span, .footer-top-link:focus-visible span { transform: translateY(-3px); }
 .footer-credit a:hover, .footer-credit a:focus-visible, .footer-top-link:hover, .footer-top-link:focus-visible { color: var(--gold-bright); }
@@ -396,7 +397,7 @@ h1 em, h2 em { color: var(--gold); font-weight: 500; }
   .hours-list li b { font-size: 10px; }
   .visit-book { min-height: 330px; }
   .visit-book .button { width: auto; min-width: 225px; padding: 0 17px; font-size: 10px; }
-  .phone-link { margin-top: 17px; }
+  .visit-book .phone-link { margin: 17px 0 0; }
   .site-footer { padding: 25px 20px 15px; }
   .footer-top { min-height: 0; grid-template-columns: 1fr 1fr; column-gap: 14px; row-gap: 16px; padding-bottom: 16px; }
   .footer-brand { grid-column: 1; grid-row: 1; }
